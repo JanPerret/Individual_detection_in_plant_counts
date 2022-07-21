@@ -37,3 +37,9 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+# Exclude everything in the folder output
+output/*
+
+# Exclude the Rproj file
+*.Rproj
