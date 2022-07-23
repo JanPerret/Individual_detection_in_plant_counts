@@ -431,13 +431,13 @@ write.csv2(df_3_methods_without_excess_detect, file = "./data/tidy/df_3_methods_
 write.csv2(df_3_methods_excess_detect_set_to_1, file = "./data/tidy/df_3_methods_4_excess_detect_set_to_1.csv", row.names = FALSE)
 
 
-# dim(df_3_methods_0) # 5205   15
-# dim(df_3_methods_without_empty_quadrats) # 4635   15
-# dim(df_3_methods_without_excess_detect) # 4467   15
-# dim(df_3_methods_excess_detect_set_to_1) # 4635   15
+# dim(df_3_methods_0) # 5055   14
+# dim(df_3_methods_without_empty_quadrats) # 4485   14
+# dim(df_3_methods_without_excess_detect) # 4319   14
+# dim(df_3_methods_excess_detect_set_to_1) # 4485   14
 
 # df_test <- subset(df_3_methods_without_empty_quadrats, df_3_methods_without_empty_quadrats$excess_detect == 1)
-# dim(df_test) # ---> 142 observations with more than 100% detection are removed from the dataset after removing the empty quadrats.
+# dim(df_test) # ---> 140 observations with more than 100% detection are removed from the dataset after removing the empty quadrats.
 
 
 

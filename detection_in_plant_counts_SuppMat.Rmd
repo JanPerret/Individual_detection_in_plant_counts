@@ -203,253 +203,6 @@ colnames(df_mod_final_s_betas_random_effects) <- c("term", "SD", "variance")
 df_mod_final_s_betas_random_effects$variance <- df_mod_final_s_betas_random_effects$SD^2
 df_mod_final_s_betas_random_effects$term[1] <- "species:quadrat_id"
 
-# # make the table for the plot
-# df_mod_betas_plot <- cbind(df_mod_final_s_betas, signif = NA)
-# 
-# # fill column signif for the color of points and confidence intervals
-# for (i in 1:nrow(df_mod_betas_plot)) {
-#   if (df_mod_betas_plot$estimate[i] > 0) {df_mod_betas_plot$signif[i] <- "positive"}
-#   if (df_mod_betas_plot$estimate[i] < 0) {df_mod_betas_plot$signif[i] <- "negative"}
-#   if (df_mod_betas_plot$p.value[i] > 0.05) {df_mod_betas_plot$signif[i] <- "NS"}
-# }
-# 
-# # make term an ordered factor
-# df_mod_betas_plot$term <- factor(df_mod_betas_plot$term, levels = rev(df_mod_betas_plot$term))
-# 
-# # make the plot
-# plot_figure_2 <- ggplot(df_mod_betas_plot, aes(x = estimate, y = term, color = signif)) +
-#   geom_vline(xintercept = 0, color = "black") +
-#   geom_point(size = 2.3) +
-#   geom_errorbar(aes(xmin = conf.low, xmax = conf.high), width = 0, size = 0.8) +
-#   theme_bw() +
-#   scale_color_manual(values = c("#e31a1c", "#525252", "#3690c0")) +
-#   theme(legend.position = "none") +
-#   xlab("Log-Odds") +
-#   ylab("")
-# 
-# plot_figure_2
-
-```
-
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height = 7, fig.width = 9}
-
-# mypalette <- c('#e41a1c','#377eb8','#4daf4a','#984ea3')
-# 
-# # count_30s
-# val <- c(-1.5, 0.5, 2.5)
-# pred_30s <- as.data.frame(ggeffects::ggpredict(mod_final, terms = c("counting_time_1m [0]", "species_conspicuousness [all]", "habitat_closure [val]"), type = "fixed",
-#                                                condition = c(species_conspicuousness = 2, habitat_closure = 0, exp_bota = 2.5,
-#                                                              count_TRUE = 100, counting_time_1m = 0, counting_time_cells = 0, quadrat_order = 5,
-#                                                              counting_method = "count_30s")))
-# pred_30s$x <- 0.5
-# colnames(pred_30s) <- c("counting_time", "prop_detect", "std.error", "conf.low", "conf.high", "species_conspicuousness", "habitat_closure")
-# 
-# # modify counting_time so the points don't overlap
-# pred_30s <- within(pred_30s, counting_time[species_conspicuousness == 1] <- 0.25)
-# pred_30s <- within(pred_30s, counting_time[species_conspicuousness == 2] <- 0.375)
-# pred_30s <- within(pred_30s, counting_time[species_conspicuousness == 3] <- 0.5)
-# pred_30s <- within(pred_30s, counting_time[species_conspicuousness == 4] <- 0.625)
-# 
-# # make the plot
-# plot_30s <- ggplot(data = pred_30s, aes(x = counting_time, y = prop_detect, group = species_conspicuousness, color = species_conspicuousness)) +
-#   facet_grid(as.factor(habitat_closure) ~ .) +
-#   geom_errorbar(aes(ymin = conf.low, ymax = conf.high, group = species_conspicuousness, color = species_conspicuousness), size = 1, width = 0) +
-#   geom_point(size = 2) +
-#   ylim(c(0, 1)) +
-#   xlim(c(0, 0.875)) +
-#   theme_bw() +
-#   ggtitle("Quick count") +
-#   xlab("Completed in 30 seconds") +
-#   ylab("Proportion of detected individuals") +
-#   scale_color_manual(values = mypalette) +
-#   theme(legend.position = "bottom", plot.title = element_text(hjust = 0.5), 
-#         strip.background = element_blank(), strip.text.y = element_blank(),
-#         panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(),
-#         axis.ticks.x = element_blank(), axis.text.x = element_blank()) +
-#   guides(color = "none")
-# 
-# # count_1m
-# val <- c(-1.5, 0.5, 2.5)
-# pred_1m <- as.data.frame(ggeffects::ggpredict(mod_final, terms = c("counting_time_1m [all]", "species_conspicuousness [all]", "habitat_closure [val]"), type = "fixed",
-#                                               condition = c(species_conspicuousness = 2, habitat_closure = 0, exp_bota = 2.5,
-#                                                             count_TRUE = 100, counting_time_1m = 0, counting_time_cells = 0, quadrat_order = 5,
-#                                                             counting_method = "count_1m")))
-# colnames(pred_1m) <- c("counting_time", "prop_detect", "std.error", "conf.low", "conf.high", "species_conspicuousness", "habitat_closure")
-# 
-# # make the plot
-# plot_1m <- ggplot(data = pred_1m, aes(x = counting_time, y = prop_detect, group = species_conspicuousness, color = species_conspicuousness)) +
-#   facet_grid(as.factor(habitat_closure) ~ .) +
-#   geom_ribbon(aes(ymin = conf.low, ymax = conf.high, group = species_conspicuousness, fill = species_conspicuousness), alpha = 0.2, colour = NA) +
-#   geom_line(size = 1) +
-#   ylim(c(0, 1)) +
-#   theme_bw() +
-#   ggtitle("Unlimited count") +
-#   xlab("Time spent counting (min)") +
-#   scale_color_manual(values = mypalette) +
-#   theme(legend.position = "bottom", plot.title = element_text(hjust = 0.5),
-#         axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), 
-#         strip.background = element_blank(), strip.text.y = element_blank()) +
-#   guides(color = guide_legend(title = "Species conspicuousness"), fill = guide_legend(title = "Species conspicuousness"))
-# 
-# 
-# # predicted detection rate for the mean values of all variables
-# df_1m <- subset(df_3_methods, df_3_methods$counting_method == "count_1m")
-# mean_time_1m <- mean(df_1m$counting_time_1m)
-# pred_mean_1m <- as.data.frame(ggeffects::ggpredict(mod_final, terms = c("counting_time_1m [mean_time_1m]", "species_conspicuousness [2.5]", "habitat_closure [0]"), type = "fixed",
-#                                                    condition = c(exp_bota = 2.5, count_TRUE = 100, counting_time_1m = 0, counting_time_cells = 0, quadrat_order = 5,
-#                                                                  counting_method = "count_1m")))
-# 
-# # count_cells
-# val <- c(-1.5, 0.5, 2.5)
-# pred_cells <- as.data.frame(ggeffects::ggpredict(mod_final, terms = c("counting_time_cells [all]", "species_conspicuousness [all]", "habitat_closure [val]"), type = "fixed",
-#                                                  condition = c(species_conspicuousness = 2, habitat_closure = 0, exp_bota = 2.5,
-#                                                                count_TRUE = 100, counting_time_1m = 0, counting_time_cells = 0, quadrat_order = 5,
-#                                                                counting_method = "count_cells")))
-# colnames(pred_cells) <- c("counting_time", "prop_detect", "std.error", "conf.low", "conf.high", "species_conspicuousness", "habitat_closure")
-# 
-# facet_names <- as_labeller(c(`-1.5` = "Habitat closure = -1.5", `0.5` = "Habitat closure = 0.5",`2.5` = "Habitat closure = 2.5"))
-# 
-# # make the plot
-# plot_cells <- ggplot(data = pred_cells, aes(x = counting_time, y = prop_detect, group = species_conspicuousness, color = species_conspicuousness)) +
-#   facet_grid(as.factor(habitat_closure) ~ ., labeller = facet_names) +
-#   geom_ribbon(aes(ymin = conf.low, ymax = conf.high, group = species_conspicuousness, fill = species_conspicuousness), alpha = 0.2, colour = NA) +
-#   geom_line(size = 1) +
-#   ylim(c(0, 1)) +
-#   theme_bw() +
-#   ggtitle("Cell count") +
-#   xlab("Time spent counting (min)") +
-#   scale_color_manual(values = mypalette) +
-#   theme(legend.position = "bottom", plot.title = element_text(hjust = 0.5),
-#         axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(),
-#         strip.text.y = element_text(size = 11)) +
-#   guides(color = guide_legend(title = "Species conspicuousness"), fill = guide_legend(title = "Species conspicuousness"))
-# 
-# # combine the plots with the package patchwork
-# plot_figure_3 <- plot_30s + plot_1m + plot_cells + 
-#   plot_layout(guides = 'collect') &
-#   theme(legend.position = 'bottom')
-# 
-# plot_figure_3
-
-```
-
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height = 3.6, fig.width = 9}
-# ### effect of the experience in botany
-# pred_30s <- as.data.frame(ggeffects::ggpredict(mod_final, terms = c("exp_bota [all]", "counting_method [all]"), type = "fixed",
-#                                                condition = c(species_conspicuousness = 2, habitat_closure = 0, exp_bota = 2.5,
-#                                                              count_TRUE = 100, counting_time_1m = 0, counting_time_cells = 0, quadrat_order = 5)))
-# pred_30s <- subset(pred_30s, pred_30s$group == "count_30s")
-# 
-# pred_1m <- as.data.frame(ggeffects::ggpredict(mod_final, terms = c("exp_bota [all]", "counting_method [all]"), type = "fixed",
-#                                               condition = c(species_conspicuousness = 2, habitat_closure = 0, exp_bota = 2.5,
-#                                                             count_TRUE = 100, counting_time_1m = 3, counting_time_cells = 0, quadrat_order = 5)))
-# pred_1m <- subset(pred_1m, pred_1m$group == "count_1m")
-# 
-# pred_cells <- as.data.frame(ggeffects::ggpredict(mod_final, terms = c("exp_bota [all]", "counting_method [all]"), type = "fixed",
-#                                                  condition = c(species_conspicuousness = 2, habitat_closure = 0, exp_bota = 2.5,
-#                                                                count_TRUE = 100, counting_time_1m = 0, counting_time_cells = 3, quadrat_order = 5)))
-# pred_cells <- subset(pred_cells, pred_cells$group == "count_cells")
-# 
-# pred <- tibble(rbind(pred_30s, pred_1m, pred_cells))
-# colnames(pred) <- c("exp_bota", "prop_detect", "std.error", "conf.low", "conf.high", "counting_method")
-# 
-# # change the name of the counting methods
-# pred$counting_method <- gsub(pattern = "count_30s", replacement = "Quick count", x = pred$counting_method, fixed = TRUE)
-# pred$counting_method <- gsub(pattern = "count_1m", replacement = "Unlimited count", x = pred$counting_method, fixed = TRUE)
-# pred$counting_method <- gsub(pattern = "count_cells", replacement = "Cell count", x = pred$counting_method, fixed = TRUE)
-# pred$counting_method <- factor(pred$counting_method, levels = c("Quick count", "Unlimited count", "Cell count"))
-# 
-# plot_exp_bota <- ggplot(data = pred, aes(x = exp_bota, y = prop_detect, group = counting_method, color = counting_method)) +
-#   geom_line(size = 1.2) +
-#   geom_ribbon(aes(ymin = conf.low, ymax = conf.high, group = counting_method, fill = counting_method), alpha = 0.2, colour = NA) +
-#   ylim(c(0, 1)) +
-#   theme_bw() +
-#   xlab("Experience in botany") +
-#   ylab("Detection probability") +
-#   guides(color = guide_legend(title = "Counting method"), fill = guide_legend(title = "Counting method")) +
-#   annotate("text", x = 4.75, y = 0.97, label = "A", size = 5, fontface = 2)
-# 
-# 
-# ### effect of the density of individuals
-# pred_30s <- as.data.frame(ggeffects::ggpredict(mod_final, terms = c("count_TRUE [all]", "counting_method [all]"), type = "fixed",
-#                                                condition = c(species_conspicuousness = 2, habitat_closure = 0, exp_bota = 2.5,
-#                                                              count_TRUE = 100, counting_time_1m = 0, counting_time_cells = 0, quadrat_order = 5)))
-# pred_30s <- subset(pred_30s, pred_30s$group == "count_30s")
-# 
-# pred_1m <- as.data.frame(ggeffects::ggpredict(mod_final, terms = c("count_TRUE [all]", "counting_method [all]"), type = "fixed",
-#                                               condition = c(species_conspicuousness = 2, habitat_closure = 0, exp_bota = 2.5,
-#                                                             count_TRUE = 100, counting_time_1m = 3, counting_time_cells = 0, quadrat_order = 5)))
-# pred_1m <- subset(pred_1m, pred_1m$group == "count_1m")
-# 
-# pred_cells <- as.data.frame(ggeffects::ggpredict(mod_final, terms = c("count_TRUE [all]", "counting_method [all]"), type = "fixed",
-#                                                  condition = c(species_conspicuousness = 2, habitat_closure = 0, exp_bota = 2.5,
-#                                                                count_TRUE = 100, counting_time_1m = 0, counting_time_cells = 3, quadrat_order = 5)))
-# pred_cells <- subset(pred_cells, pred_cells$group == "count_cells")
-# 
-# pred <- tibble(rbind(pred_30s, pred_1m, pred_cells))
-# colnames(pred) <- c("count_TRUE", "prop_detect", "std.error", "conf.low", "conf.high", "counting_method")
-# 
-# # change the name of the counting methods
-# pred$counting_method <- gsub(pattern = "count_30s", replacement = "Quick count", x = pred$counting_method, fixed = TRUE)
-# pred$counting_method <- gsub(pattern = "count_1m", replacement = "Unlimited count", x = pred$counting_method, fixed = TRUE)
-# pred$counting_method <- gsub(pattern = "count_cells", replacement = "Cell count", x = pred$counting_method, fixed = TRUE)
-# pred$counting_method <- factor(pred$counting_method, levels = c("Quick count", "Unlimited count", "Cell count"))
-# 
-# plot_count_TRUE <- ggplot(data = pred, aes(x = count_TRUE, y = prop_detect, group = counting_method, color = counting_method)) +
-#   geom_line(size = 1.2) +
-#   geom_ribbon(aes(ymin = conf.low, ymax = conf.high, group = counting_method, fill = counting_method), alpha = 0.2, colour = NA) +
-#   ylim(c(0, 1)) +
-#   theme_bw() +
-#   xlab("Individuals in the quadrat") +
-#   ylab("") +
-#   guides(color = guide_legend(title = "Counting method"), fill = guide_legend(title = "Counting method")) +
-#   annotate("text", x = 285, y = 0.97, label = "B", size = 5, fontface = 2)
-# 
-# 
-# ### effect of fatigue
-# pred_30s <- as.data.frame(ggeffects::ggpredict(mod_final, terms = c("quadrat_order [all]", "counting_method [all]"), type = "fixed",
-#                                                condition = c(species_conspicuousness = 2, habitat_closure = 0, exp_bota = 2.5,
-#                                                              count_TRUE = 100, counting_time_1m = 0, counting_time_cells = 0, quadrat_order = 5)))
-# pred_30s <- subset(pred_30s, pred_30s$group == "count_30s")
-# 
-# pred_1m <- as.data.frame(ggeffects::ggpredict(mod_final, terms = c("quadrat_order [all]", "counting_method [all]"), type = "fixed",
-#                                               condition = c(species_conspicuousness = 2, habitat_closure = 0, exp_bota = 2.5,
-#                                                             count_TRUE = 100, counting_time_1m = 3, counting_time_cells = 0, quadrat_order = 5)))
-# pred_1m <- subset(pred_1m, pred_1m$group == "count_1m")
-# 
-# pred_cells <- as.data.frame(ggeffects::ggpredict(mod_final, terms = c("quadrat_order [all]", "counting_method [all]"), type = "fixed",
-#                                                  condition = c(species_conspicuousness = 2, habitat_closure = 0, exp_bota = 2.5,
-#                                                                count_TRUE = 100, counting_time_1m = 0, counting_time_cells = 3, quadrat_order = 5)))
-# pred_cells <- subset(pred_cells, pred_cells$group == "count_cells")
-# 
-# pred <- tibble(rbind(pred_30s, pred_1m, pred_cells))
-# colnames(pred) <- c("quadrat_order", "prop_detect", "std.error", "conf.low", "conf.high", "counting_method")
-# 
-# # change the name of the counting methods
-# pred$counting_method <- gsub(pattern = "count_30s", replacement = "Quick count", x = pred$counting_method, fixed = TRUE)
-# pred$counting_method <- gsub(pattern = "count_1m", replacement = "Unlimited count", x = pred$counting_method, fixed = TRUE)
-# pred$counting_method <- gsub(pattern = "count_cells", replacement = "Cell count", x = pred$counting_method, fixed = TRUE)
-# pred$counting_method <- factor(pred$counting_method, levels = c("Quick count", "Unlimited count", "Cell count"))
-# 
-# plot_quadrat_order <- ggplot(data = pred, aes(x = quadrat_order, y = prop_detect, group = counting_method, color = counting_method)) +
-#   geom_line(size = 1.2) +
-#   geom_ribbon(aes(ymin = conf.low, ymax = conf.high, group = counting_method, fill = counting_method), alpha = 0.2, colour = NA) +
-#   ylim(c(0, 1)) +
-#   theme_bw() +
-#   xlab("Quadrat order") +
-#   ylab("") +
-#   guides(color = guide_legend(title = "Counting method"), fill = guide_legend(title = "Counting method")) +
-#   annotate("text", x = 9.5, y = 0.97, label = "C", size = 5, fontface = 2)
-# 
-# # combine the plots
-# plot_figure_4 <- plot_exp_bota + plot_count_TRUE + plot_quadrat_order +
-#   plot_layout(guides = 'collect') &
-#   theme(legend.position = 'bottom')
-# 
-# plot_figure_4
-
 ```
 
 
@@ -475,14 +228,8 @@ df_session_recap <- read_csv2(file = "./data/tidy/field_session_overview.csv", c
 # remove columns with the coordinates
 df_session_recap_for_print <- subset(df_session_recap, select = -c(Latitude, Longitude))
 
-# remove the test session
-df_session_recap_for_print <- subset(df_session_recap_for_print, df_session_recap_for_print$Date != "31/07/2020")
 
 # # print the session recap table
-# df_session_recap_for_print %>%
-#   kbl(align = c('l', 'l', 'l', 'l', 'l', 'c')) %>%
-#   kable_styling()
-
 ft <- flextable(df_session_recap_for_print)
 ft <- theme_vanilla(ft)
 ft <- align_text_col(ft, align = "left")
@@ -499,7 +246,7 @@ ft
 df_site_coord <- df_session_recap[, 1:5]
 
 # remove the session that were made on the same sites than others to have only one row per site
-vect_sessions_to_remove <- c("31/07/2020", "16/10/2020", "20/10/2020", "28/10/2020", "23/04/2021", "19/05/2021", "26/05/2021", "27/05/2021")
+vect_sessions_to_remove <- c("16/10/2020", "20/10/2020", "28/10/2020", "23/04/2021", "19/05/2021", "26/05/2021", "27/05/2021")
 df_site_coord <- subset(df_site_coord, !(df_site_coord$Date %in% vect_sessions_to_remove))
 
 # make the map
@@ -533,11 +280,6 @@ For each field session, we visually estimated in which range the mean height of 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # table with the species_conspicuousness values for all the sampled species
-
-# # print the table
-# kable(df_species_conspicuousness[order(df_species_conspicuousness$species_conspicuousness, df_species_conspicuousness$species_name), ],
-#       align = c('l', 'l', 'c')) %>%
-#   kable_styling(full_width = TRUE)
 
 # print the table
 df_for_docx_table <- df_species_conspicuousness[order(df_species_conspicuousness$species_conspicuousness, df_species_conspicuousness$species_name), ]
@@ -750,6 +492,10 @@ n_empty_quadrats <- nrow(unique(df_empty_quadrats[, c(1, 5)]))
 n_obs_empty_quadrats <- nrow(df_empty_quadrats)
 n_obs_excess_empty_quadrats <- sum(df_empty_quadrats$excess_detect)
 
+# average number of observers per field session
+df_nobs_per_session <- unique(df_3_methods_0[c("species", "obs_id")])
+mean_number_of_observers_per_session <- mean(table(df_nobs_per_session$species))
+
 # load the dataset without the empty quadrats
 df_3_methods_excess <- read_csv2(file = "./data/tidy/df_3_methods_2_without_empty_quadrats.csv")
 
@@ -782,11 +528,6 @@ df_excess_per_sp <- df_3_methods_excess %>%
 colnames(df_excess_per_sp) <- c("Species", "Total number of observations", "Number of excess detections", "Proportion of excess detections")
 
 # print the table
-# kable(df_excess_per_sp,
-#       align = c('l', 'r', 'r', 'r'),
-#       digits = 3) %>%
-#   kable_styling(full_width = TRUE)
-
 ft <- flextable(df_excess_per_sp)
 ft <- theme_vanilla(ft)
 ft <- align_text_col(ft, align = "left")
@@ -816,11 +557,6 @@ df_excess_per_exp <- df_3_methods_excess %>%
 colnames(df_excess_per_exp) <- c("Experience in botany", "Total number of observations", "Number of excess detections", "Proportion of excess detections")
 
 # print the table
-# kable(df_excess_per_exp,
-#       align = c('c', 'r', 'r', 'r'),
-#       digits = 3) %>%
-#   kable_styling(full_width = TRUE)
-
 ft <- flextable(df_excess_per_exp)
 ft <- theme_vanilla(ft)
 ft <- align_text_col(ft, align = "left")
@@ -895,11 +631,6 @@ mod_final <- glmer(prop_detect ~ (1|species) + (1|species:quadrat_id) + (1|obs_i
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # print the table
-# kable(df_mod_final_s_betas,
-#       align = c('l', 'r', 'r', 'r', 'r', 'r', 'r'),
-#       digits = 4) %>%
-#   kable_styling(full_width = TRUE)
-
 ft <- flextable(df_mod_final_s_betas)
 ft <- theme_vanilla(ft)
 ft <- align_text_col(ft, align = "left")
@@ -916,11 +647,6 @@ ft
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # print the table
-# kable(df_mod_final_s_betas_random_effects,
-#       align = c('l', 'r', 'r'),
-#       digits = 4) %>%
-#   kable_styling(full_width = TRUE)
-
 ft <- flextable(df_mod_final_s_betas_random_effects)
 ft <- theme_vanilla(ft)
 ft <- align_text_col(ft, align = "left")
@@ -935,6 +661,63 @@ ft
 
 
 ```{r, include = FALSE}
+### compute the predicted values cited in main text of the article
+
+### predicted detection probability for the unlimited count under average conditions
+pred_1m_avrg_conditions <- as.data.frame(ggeffects::ggpredict(mod_final, terms = c("counting_method [all]"), type = "fixed",
+                                              condition = c(species_conspicuousness = 2.5, habitat_closure = 0.5, exp_bota = 2.5,
+                                                            count_TRUE = 100, counting_time_1m = 3, counting_time_cells = 0, quadrat_order = 5)))
+pred_1m_avrg_conditions <- subset(pred_1m_avrg_conditions, pred_1m_avrg_conditions$x == "count_1m")
+
+
+### difference in detection probability between extreme levels of species conspicuousness in the most closed habitats (estimated difference for the unlimited count with 3 minutes counting time)
+pred_1m_diff_conspi_closed_hab <- as.data.frame(ggeffects::ggpredict(mod_final, terms = c("species_conspicuousness [all]", "counting_method [all]"), type = "fixed",
+                                              condition = c(habitat_closure = 2.5, exp_bota = 2.5,
+                                                            count_TRUE = 100, counting_time_1m = 3, counting_time_cells = 0, quadrat_order = 5)))
+pred_1m_diff_conspi_closed_hab <- subset(pred_1m_diff_conspi_closed_hab, pred_1m_diff_conspi_closed_hab$group == "count_1m")
+pred_1m_diff_conspi_closed_hab <- pred_1m_diff_conspi_closed_hab$predicted[4] - pred_1m_diff_conspi_closed_hab$predicted[1]
+
+
+### effect of the density of individuals on detection probability (illustrated by the difference between a quadrat with 20 and 300 individuals)
+val <- c(20, 300)
+pred_1m_density_effect_20_300 <- as.data.frame(ggeffects::ggpredict(mod_final, terms = c("count_TRUE [val]", "counting_method [all]"), type = "fixed",
+                                              condition = c(species_conspicuousness = 2.5, habitat_closure = 0.5, exp_bota = 2.5,
+                                                            counting_time_1m = 3, counting_time_cells = 0, quadrat_order = 5)))
+pred_1m_density_effect_20_300 <- subset(pred_1m_density_effect_20_300, pred_1m_density_effect_20_300$group == "count_1m")
+
+
+### estimated detection probability for the 3 counting methods under average conditions
+pred_30s_avrg_conditions <- as.data.frame(ggeffects::ggpredict(mod_final, terms = c("counting_method [all]"), type = "fixed",
+                                              condition = c(species_conspicuousness = 2.5, habitat_closure = 0.5, exp_bota = 2.5,
+                                                            count_TRUE = 100, counting_time_1m = 0, counting_time_cells = 0, quadrat_order = 5)))
+pred_30s_avrg_conditions <- subset(pred_30s_avrg_conditions, pred_30s_avrg_conditions$x == "count_30s")
+
+pred_1m_avrg_conditions <- as.data.frame(ggeffects::ggpredict(mod_final, terms = c("counting_method [all]"), type = "fixed",
+                                              condition = c(species_conspicuousness = 2.5, habitat_closure = 0.5, exp_bota = 2.5,
+                                                            count_TRUE = 100, counting_time_1m = 1.8, counting_time_cells = 0, quadrat_order = 5)))
+pred_1m_avrg_conditions <- subset(pred_1m_avrg_conditions, pred_1m_avrg_conditions$x == "count_1m")
+
+pred_cells_avrg_conditions <- as.data.frame(ggeffects::ggpredict(mod_final, terms = c("counting_method [all]"), type = "fixed",
+                                              condition = c(species_conspicuousness = 2.5, habitat_closure = 0.5, exp_bota = 2.5,
+                                                            count_TRUE = 100, counting_time_1m = 0, counting_time_cells = 8.2, quadrat_order = 5)))
+pred_cells_avrg_conditions <- subset(pred_cells_avrg_conditions, pred_cells_avrg_conditions$x == "count_cells")
+
+pred_3_methods_avrg_conditions <- rbind(pred_30s_avrg_conditions, pred_1m_avrg_conditions, pred_cells_avrg_conditions)
+
+
+### difference in detection probability for the unlimited count when counting time is increased from 1 to 10 minutes
+val <- c(1, 10)
+pred_1m_time_effect_1_10 <- as.data.frame(ggeffects::ggpredict(mod_final, terms = c("counting_time_1m [val]", "counting_method [all]"), type = "fixed",
+                                              condition = c(species_conspicuousness = 2.5, habitat_closure = 0.5, exp_bota = 2.5,
+                                                            count_TRUE = 100, counting_time_cells = 0, quadrat_order = 5)))
+pred_1m_time_effect_1_10 <- subset(pred_1m_time_effect_1_10, pred_1m_time_effect_1_10$group == "count_1m")
+
+```
+
+
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height = 6, fig.width = 7}
 ### predicted differences between the levels of experience in botany depending on species conspicuousness and habitat closure
 
 # difference between levels of experience in botany - IN EASY CONDITIONS
