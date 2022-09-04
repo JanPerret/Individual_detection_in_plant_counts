@@ -577,7 +577,7 @@ df_mod_final_s_betas$term <- gsub(pattern = ":", replacement = " x ", x = df_mod
 df_mod_final_s_betas$term <- gsub(pattern = "count_1m", replacement = " [unlimited count]", x = df_mod_final_s_betas$term, fixed = TRUE)
 df_mod_final_s_betas$term <- gsub(pattern = "count_cells", replacement = " [cell count]", x = df_mod_final_s_betas$term, fixed = TRUE)
 df_mod_final_s_betas$term <- gsub(pattern = "count_TRUE", replacement = "Density", x = df_mod_final_s_betas$term, fixed = TRUE)
-df_mod_final_s_betas$term <- gsub(pattern = "exp_bota", replacement = "Experience botany", x = df_mod_final_s_betas$term, fixed = TRUE)
+df_mod_final_s_betas$term <- gsub(pattern = "exp_bota", replacement = "Botany experience", x = df_mod_final_s_betas$term, fixed = TRUE)
 df_mod_final_s_betas$term <- gsub(pattern = "counting_time_1m", replacement = "Counting_time x counting_method [unlimited count]", x = df_mod_final_s_betas$term, fixed = TRUE)
 df_mod_final_s_betas$term <- gsub(pattern = "counting_time_cells", replacement = "Counting_time x counting_method [cell count]", x = df_mod_final_s_betas$term, fixed = TRUE)
 df_mod_final_s_betas$term <- gsub(pattern = "counting_method", replacement = "Method", x = df_mod_final_s_betas$term, fixed = TRUE)
