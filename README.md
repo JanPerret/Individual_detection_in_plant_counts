@@ -13,5 +13,5 @@ To make the supplementary material document, open the following script in RStudi
 
 ## Data licence
 
-The files in the 'data' folder are licensed under [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Licence (CC BY-NC-ND 4.0) ](https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode).
+The files in the 'data' folder are licensed under [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Licence (CC BY-NC-ND 4.0) ](https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode). Please contact me if you would like to use this dataset for your own research or teaching.
 
