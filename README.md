@@ -11,3 +11,7 @@ To load and format the data, perform model selection and make the figures for th
 
 To make the supplementary material document, open the following script in RStudio and knit it to Word format : detection_in_plant_counts_SuppMat.Rmd
 
+## Data licence
+
+The files in the 'data' folder are licensed under [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Licence (CC BY-NC-ND 4.0) ](https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode).
+
