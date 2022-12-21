@@ -88,14 +88,14 @@ df_data_experimenter <- df_data_experimenter[, -c(2, 3)]
 
 #### join the species_conspicuousness variable and session date ####
 df_species_conspicuousness <- read_csv2(file = "./data/raw/data_species_conspicuousness.csv", col_names = TRUE, col_types = cols(.default = "c"))
-df_species_conspicuousness$date <- as.Date(df_species_conspicuousness$date, tryFormats = c("%d/%m/%Y"))
+df_species_conspicuousness$Date <- as.Date(df_species_conspicuousness$Date, tryFormats = c("%d/%m/%Y"))
 
 # join the column species_conspicuousness to df_data_experimenter
-df_data_experimenter <- left_join(df_data_experimenter, df_species_conspicuousness[, c(2, 3)], by = c("species" = "species_code"))
-df_data_experimenter$species_conspicuousness <- as.numeric(df_data_experimenter$species_conspicuousness) # convert to numeric
+df_data_experimenter <- left_join(df_data_experimenter, df_species_conspicuousness[, c(2, 3)], by = c("species" = "Species_code"))
+df_data_experimenter$Species_conspicuousness <- as.numeric(df_data_experimenter$Species_conspicuousness) # convert to numeric
 
 # join the date to df_data_participant
-df_data_participant <- left_join(df_species_conspicuousness[, c(2, 4)], df_data_participant, by = c("species_code" = "species"))
+df_data_participant <- left_join(df_species_conspicuousness[, c(2, 4)], df_data_participant, by = c("Species_code" = "species"))
 colnames(df_data_participant)[1] <- "species"
 
 
@@ -302,7 +302,6 @@ df_data_participant <- left_join(df_data_participant, df_data_experimenter, by =
 write.csv2(df_data_experimenter, file = "./data/tidy/df_data_experimenter.csv", row.names = FALSE)
 
 
-
 #### join the experience in botany of the participants ####
 df_data_exp_bota <- read_csv2("./data/raw/data_observer_experience_botany_anonymous.csv", col_names = TRUE, col_types = cols(.default = "c"))
 
@@ -347,7 +346,7 @@ data_cells_0 <- df_data_participant
 
 # keep only necessary columns for data_30s_0
 data_30s_0_join <- data_30s_0[, c("species", "obs_id", "obs_letter", "quadrat_num", "count_30s", "prop_30s",
-                                  "quadrat_order_30s", "count_TRUE", "species_conspicuousness", "habitat_closure", "exp_bota")]
+                                  "quadrat_order_30s", "count_TRUE", "Species_conspicuousness", "habitat_closure", "exp_bota")]
 
 # rename columns for the future cbind
 colnames(data_30s_0_join) <- c("species", "obs_id", "obs_letter", "quadrat_num", "count", "prop_detect",
@@ -364,7 +363,7 @@ data_30s_0_join <- data_30s_0_join[, c("species", "obs_id", "obs_letter", "count
 
 # keep only necessary columns for data_1m_0
 data_1m_0_join <- data_1m_0[, c("species", "obs_id", "obs_letter", "quadrat_num", "count_1m", "counting_time_1m", "prop_1m",
-                                "quadrat_order_1m", "count_TRUE", "species_conspicuousness", "habitat_closure", "exp_bota")]
+                                "quadrat_order_1m", "count_TRUE", "Species_conspicuousness", "habitat_closure", "exp_bota")]
 colnames(data_1m_0_join) <- c("species", "obs_id", "obs_letter", "quadrat_num", "count", "counting_time", "prop_detect",
                               "quadrat_order", "count_TRUE", "species_conspicuousness", "habitat_closure", "exp_bota")
 
@@ -376,7 +375,7 @@ data_1m_0_join <- data_1m_0_join[, c("species", "obs_id", "obs_letter", "countin
 
 # keep only necessary columns for data_cells_0
 data_cells_0_join <- data_cells_0[, c("species", "obs_id", "obs_letter", "quadrat_num", "count_cells", "counting_time_cells", "prop_cells",
-                                      "quadrat_order_cells", "count_TRUE", "species_conspicuousness", "habitat_closure", "exp_bota")]
+                                      "quadrat_order_cells", "count_TRUE", "Species_conspicuousness", "habitat_closure", "exp_bota")]
 colnames(data_cells_0_join) <- c("species", "obs_id", "obs_letter", "quadrat_num", "count", "counting_time", "prop_detect",
                                  "quadrat_order", "count_TRUE", "species_conspicuousness", "habitat_closure", "exp_bota")
 
@@ -441,7 +440,7 @@ write.csv2(df_3_methods_excess_detect_set_to_1, file = "./data/tidy/df_3_methods
 
 
 
-#### MODEL SELECTION ####
+#### FIT THE MODEL ####
 
 # load packages
 library(tidyverse)
@@ -474,63 +473,14 @@ df_3_methods$counting_method <- factor(df_3_methods$counting_method, levels = c(
 # add a column with a unique quadrat identification
 df_3_methods <- cbind(df_3_methods, quadrat_id = paste0(df_3_methods$species, "_", df_3_methods$quadrat_num))
 
-# add a column with squared quadrat_order
-df_3_methods <- cbind(df_3_methods, quadrat_order_squared = df_3_methods$quadrat_order^2)
-
 # convert to tibble
 df_3_methods <- tibble(df_3_methods)
 
-# /!\ The lines below use the parallelised version of the function dredge() to perform model selection
-# as there are many models to test this can take considerable computing time
 
-# # fit the full model
-# mod_full <- glmer(prop_detect ~ (1|species) + (1|species:quadrat_id) + (1|obs_id)
-#                   + species_conspicuousness * habitat_closure
-#                   + species_conspicuousness * counting_method
-#                   + habitat_closure * counting_method
-#                   + exp_bota * counting_method
-#                   + count_TRUE * counting_method
-#                   + quadrat_order * counting_method
-#                   + quadrat_order_squared * counting_method
-#                   + counting_time_1m * habitat_closure
-#                   + counting_time_1m * species_conspicuousness
-#                   + counting_time_cells * species_conspicuousness
-#                   + counting_time_cells * habitat_closure,
-#                   family = binomial, data = df_3_methods, weight = count_TRUE)
-# 
-# 
-# # model selection using MuMIn::pdredge
-# options(na.action = "na.fail")
-# 
-# library(parallel)
-# library(snow)
-# 
-# # Set up the cluster
-# clusterType <- "SOCK"
-# clust <- makeCluster(getOption("cl.cores", 3), nnodes = 2, type = clusterType)
-# 
-# clusterExport(clust, "df_3_methods") # export the data into the cluster nodes
-# clusterEvalQ(clust, library(lme4)) # export the package needed for model fitting into the cluster nodes
-# 
-# 
-# df_dredge <- MuMIn::pdredge(mod_full, cluster = clust, trace = 1,
-#                             subset = (species_conspicuousness & habitat_closure & exp_bota &
-#                                                  counting_method & count_TRUE &
-#                                                  `habitat_closure:species_conspicuousness` &
-#                                                  counting_time_1m & counting_time_cells))
-# 
-# # save the resulting data frame
-# write.csv2(df_dredge, file = "./data/tidy/df_model_selection.csv")
-
-
-
-#### MAKE THE FIGURES ####
-#### Figure 2 ####
-
-### fit the selected model in two versions : one with standardised predictors and one without standardising.
-### it's just for practicality that I fit the model two times, as I need the betas from the standardised version for Fig. 2
-### but to avoid needing to un-standardise the predictions I make the predictions for Figs 3 and 4 by using the not standardised version
-### of the model. Predictions are identical between the two versions of the model.
+### Fit the model in two versions : one with standardised predictors and one without standardising. It's just 
+### for practicality that I fit the model two times. I need the betas from the standardised version for Fig. 2,
+### but to avoid needing to un-standardise the estimates I make the predictions for Figs 3 and 4 by using the
+### not standardised version of the model. Predictions are identical between the two versions of the model.
 mod_final <- glmer(prop_detect ~ (1|species) + (1|species:quadrat_id) + (1|obs_id)
                    + species_conspicuousness * habitat_closure
                    + species_conspicuousness * counting_method
@@ -558,7 +508,11 @@ mod_final_s <- glmer(prop_detect ~ (1|species) + (1|species:quadrat_id) + (1|obs
                      family = binomial, data = df_3_methods, weight = count_TRUE)
 
 
-# make the table with the betas for the selected model
+#### MAKE THE FIGURES ####
+
+#### Figure 2 ####
+
+# make the table with the betas
 df_mod_final_s_betas <- broom.mixed::tidy(mod_final_s, conf.int = TRUE, effects = c("fixed", "ran_pars"))
 
 # move the columns with the confidence interval to the left
@@ -849,6 +803,7 @@ plot_quadrat_order <- ggplot(data = pred, aes(x = quadrat_order, y = prop_detect
   geom_line(size = 1.2) +
   geom_ribbon(aes(ymin = conf.low, ymax = conf.high, group = counting_method, fill = counting_method), alpha = 0.2, colour = NA) +
   ylim(c(0, 1)) +
+  scale_x_continuous(limits = c(1, 10), breaks = c(2, 4, 6, 8, 10)) +
   theme_bw() +
   xlab("Quadrat order") +
   ylab("") +
@@ -871,3 +826,51 @@ print(plot_figure_4)
 dev.off()
 
 
+
+# #### Figures for a talk at SFE2 conference ####
+# 
+# ### version of Fig. 4 with only the effects of the experience in botany and true density
+# plot_figure_4_SFE <- plot_exp_bota + plot_count_TRUE +
+#   plot_layout(guides = 'collect') &
+#   theme(legend.position = 'bottom')
+# # plot_figure_4_SFE
+# png(file = "./output/SFE_Figure4_predict_3_other_variables.png", width = 7, height = 3.6, units = "in", res = 600)
+# print(plot_figure_4_SFE)
+# dev.off()
+# 
+# ### version of Fig. 4 with only the effect of quadrat order
+# plot_figure_4_SFE_quadrat_order <- plot_quadrat_order + 
+#   plot_layout(guides = 'collect') &
+#   theme(legend.position = 'bottom')
+# # plot_figure_4_SFE_quadrat_order
+# png(file = "./output/SFE_Figure4_predict_3_other_variables_quadrat_order.png", width = 5, height = 4.6, units = "in", res = 600)
+# print(plot_figure_4_SFE_quadrat_order)
+# dev.off()
+# 
+# ### original figure to show the raw detection rate averaged by session for each counting method
+# df_mean_detect_rate <- df_3_methods %>% 
+#   group_by(counting_method, species) %>% 
+#   summarise(mean_detection_rate = mean(prop_detect))
+# 
+# df_mean_from_means <- df_mean_detect_rate %>% 
+#   group_by(counting_method) %>% 
+#   summarise(mean_detection_rate = round(mean(mean_detection_rate), digits = 2))
+# 
+# my_x_labs <- c("Quick count", "Unlimited count", "Cell count")
+# 
+# plot_raw_detection_rate <- ggplot(df_mean_detect_rate, aes(x = counting_method, y = mean_detection_rate, color = counting_method)) +
+#   geom_point(size = 3, position = position_jitter(w = 0.1, h = 0)) +
+#   geom_point(data = df_mean_from_means, mapping = aes(x = counting_method, y = mean_detection_rate), col = "black", size = 4, shape = 17) +
+#   ylim(c(0, 1)) +
+#   geom_hline(yintercept = 1, linetype = 2, col = 'black')+
+#   theme_bw() +
+#   xlab("Counting method") +
+#   ylab("Detection rate") +
+#   theme(legend.position = "none", text = element_text(size = 12)) +
+#   scale_x_discrete(labels = my_x_labs) +
+#   geom_text(data = df_mean_from_means, label = df_mean_from_means$mean_detection_rate, nudge_x = 0.2, nudge_y = 0.05, check_overlap = TRUE, size = 5, fontface = 'bold', col = "black")
+# 
+# 
+# png(file = "./output/SFE_plot_raw_detection_rate.png", width = 5.5, height = 3.5, units = "in", res = 600)
+# print(plot_raw_detection_rate)
+# dev.off()

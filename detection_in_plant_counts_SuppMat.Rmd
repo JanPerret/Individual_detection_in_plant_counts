@@ -16,7 +16,6 @@ toc-title: Table of contents
 always_allow_html: yes
 ---
 
-
 ```{r global_options, include = FALSE}
 # Set global chunk options
 rm(list = ls()) ### to clear namespace
@@ -30,7 +29,6 @@ opts_chunk$set(fig.width = 9, fig.height = 7, fig.align = 'center',
 knitr::opts_chunk$set(cache = TRUE)
 
 ```
-
 
 ```{r, include = FALSE}
 
@@ -48,6 +46,7 @@ library(kableExtra)
 library(sf)
 library(rnaturalearth)
 library(flextable)
+library(DHARMa)
 
 
 ### load data
@@ -205,12 +204,11 @@ df_mod_final_s_betas_random_effects$term[1] <- "species:quadrat_id"
 
 ```
 
-
 # Appendix 1: Summary of the field sessions
 
 <br>
 
-**Table S1.1:** Summary of the field sessions.  <br>
+**Table S1.1:** Summary of the field sessions. <br>
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # load the table
@@ -227,7 +225,6 @@ df_session_recap <- read_csv2(file = "./data/tidy/field_session_overview.csv", c
 
 # remove columns with the coordinates
 df_session_recap_for_print <- subset(df_session_recap, select = -c(Latitude, Longitude))
-
 
 # # print the session recap table
 ft <- flextable(df_session_recap_for_print)
@@ -260,10 +257,9 @@ ggplot(data = world) +
 
 ```
 
-**Figure S1.1:** Map of the 24 study sites. Some sites were only a few kilometres apart; in this case, the corresponding points overlap.  <br>
+**Figure S1.1:** Map of the 24 study sites. Some sites were only a few kilometres apart; in this case, the corresponding points overlap. <br>
 
 <br>
-
 
 # Appendix 2: Detailed Mat&Meth
 
@@ -271,18 +267,15 @@ ggplot(data = world) +
 
 For each field session, we visually estimated the mean height range of the individuals of the target species and recorded whether or not the majority of individuals were flowering. Inconspicuous flowers (i.e. without petals or without vivid colours) were not taken into account. We then created the species conspicuousness variable with the following criteria: <br>
 
-1 -> Individuals [0 cm; 5 cm] tall, without colourful flowers <br>
-2 -> Individuals [5 cm; 10 cm] tall, or [0 cm; 5 cm] with colourful flowers <br>
-3 -> Individuals [10 cm; 20 cm] tall, without colourful flowers <br>
-4 -> Individuals [20 cm: +Inf[ tall, or [10 cm; 20 cm] with colourful flowers <br>
+1 -\> Individuals [0 cm; 5 cm] tall, without colourful flowers <br> 2 -\> Individuals [5 cm; 10 cm] tall, or [0 cm; 5 cm] with colourful flowers <br> 3 -\> Individuals [10 cm; 20 cm] tall, without colourful flowers <br> 4 -\> Individuals [20 cm: +Inf[ tall, or [10 cm; 20 cm] with colourful flowers <br>
 
-**Table S2.1:** Value of the species conspicuousness variable for the 30 sampled species (1 = least conspicuous; 4 = most conspicuous).  <br>
+**Table S2.1:** Value of the species conspicuousness variable for the 30 sampled species (1 = least conspicuous; 4 = most conspicuous). <br>
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # table with the species_conspicuousness values for all the sampled species
 
 # print the table
-df_for_docx_table <- df_species_conspicuousness[order(df_species_conspicuousness$species_conspicuousness, df_species_conspicuousness$species_name), ]
+df_for_docx_table <- df_species_conspicuousness[order(df_species_conspicuousness$Species_conspicuousness, df_species_conspicuousness$Species_name), ]
 colnames(df_for_docx_table) <- gsub(pattern = "_", replacement = " ", x = colnames(df_for_docx_table), fixed = TRUE)
 
 ft <- flextable(df_for_docx_table)
@@ -296,18 +289,15 @@ ft
 
 <br>
 
-
 ## Creation of the habitat closure variable
 
 For each quadrat, we visually estimated the proportion of the area covered by vegetation, using the cells as a guide. We also measured the height of the vegetation at 9 identical points in each quadrat, marked by the intersections of the elastic bands forming the cells (Fig. S2.1). The median of these 9 measurements was used as a measure of the height of the vegetation in each quadrat.
 
 ![](./diagram_measure_vegetation_height.png)
 
-**Figure S2.1:** Diagram with the location of the points (in blue) where we measured vegetation height in each quadrat.  <br>
+**Figure S2.1:** Diagram with the location of the points (in blue) where we measured vegetation height in each quadrat. <br>
 
-
-In order to obtain a synthetic measure of vegetation closure, we performed a PCA on the two variables (i.e. vegetation cover proportion and vegetation height) and kept the quadrat coordinates on the first principal component.  <br>
-
+In order to obtain a synthetic measure of vegetation closure, we performed a PCA on the two variables (i.e. vegetation cover proportion and vegetation height) and kept the quadrat coordinates on the first principal component. <br>
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # compute the pca
@@ -325,8 +315,7 @@ pca_explained_variance_2 <- round((mypca$eig[2]/2)*100, digits = 2)
 
 ```
 
-The first principal component explained `r pca_explained_variance_1`% of the total variance, and the second explained `r pca_explained_variance_2`% of the variance. Figure S2.2 shows the value associated with each quadrat on the first principal component, i.e. our new composite variable of habitat closure, as a function of the cover and height of the vegetation.   <br>
-
+The first principal component explained `r pca_explained_variance_1`% of the total variance, and the second explained `r pca_explained_variance_2`% of the variance. Figure S2.2 shows the value associated with each quadrat on the first principal component, i.e. our new composite variable of habitat closure, as a function of the cover and height of the vegetation. <br>
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 ggplot(data = subset(df_data_experimenter, !is.na(df_data_experimenter$habitat_closure)),
@@ -339,30 +328,19 @@ ggplot(data = subset(df_data_experimenter, !is.na(df_data_experimenter$habitat_c
 
 ```
 
-**Figure S2.2:** Value of the ‘habitat closure’ variable as a function of vegetation height and cover (-1 = least closed; 3 = most closed).  <br>
+**Figure S2.2:** Value of the 'habitat closure' variable as a function of vegetation height and cover (-1 = least closed; 3 = most closed). <br>
 
 <br>
 
 ## Evaluation of the experience in botany of the observers
 
-Before we explained the experiment to the observers, they were asked to fill in a form including a rating of their level of experience in botany on a scale of 1 to 10. In order to standardise the ratings between observers of all field sessions, a brief description was provided for every second level of this experience scale. We subsequently divided the experience level by two to obtain a scale with 5 classes (1 = least experienced; 5 = most experienced).  <br>
+Before we explained the experiment to the observers, they were asked to fill in a form including a rating of their level of experience in botany on a scale of 1 to 10. In order to standardise the ratings between observers of all field sessions, a brief description was provided for every second level of this experience scale. We subsequently divided the experience level by two to obtain a scale with 5 classes (1 = least experienced; 5 = most experienced). <br>
 
-The form was as follows :  <br>
+The form was as follows: <br>
 
-**How do you evaluate your experience in botany? (circle your level)**  <br>
-The number of known species is given as a guide. If the description of a level fits, but you can easily recognise more species than the indicated range, you can choose the higher category if you feel that it better fits your experience level. A ‘known species’ means that you can identify it with certainty without using an identification guide, or simply by quickly checking a single criterion.  <br>
+**How do you evaluate your experience in botany? (circle your level)** <br> The number of known species is given as a guide. If the description of a level fits, but you can easily recognise more species than the indicated range, you can choose the higher category if you feel that it better fits your experience level. A 'known species' means that you can identify it with certainty without using an identification guide, or simply by quickly checking a single criterion. <br>
 
-1  <br>
-2: You have previously practised botany but rarely do so now or have not practised at all for a long time. (Less than 50 known species)  <br>
-3  <br>
-4: You practice botany occasionally, or you started less than 3 years ago. (50–300 known species)  <br>
-5  <br>
-6: You practice botany regularly and have done so for more than 3 years. (300–1000 known species)  <br>
-7  <br>
-8: You have been practising botany intensively for more than 5 years and are developing expertise. (1000–2000 known species)  <br>
-9  <br>
-10: You have been practising botany intensively for more than 10 years and are recognised as an expert. (More than 2000 known species)  <br>
-
+1 <br> 2: You have previously practised botany but rarely do so now or have not practised at all for a long time. (Less than 50 known species) <br> 3 <br> 4: You practice botany occasionally, or you started less than 3 years ago. (50--300 known species) <br> 5 <br> 6: You practice botany regularly and have done so for more than 3 years. (300--1000 known species) <br> 7 <br> 8: You have been practising botany intensively for more than 5 years and are developing expertise. (1000--2000 known species) <br> 9 <br> 10: You have been practising botany intensively for more than 10 years and are recognised as an expert. (More than 2000 known species) <br>
 
 <br>
 
@@ -379,14 +357,14 @@ ggplot(df_data_experimenter_with_density_outliers, aes(x = species, y = count_TR
   geom_boxplot() +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.4, alpha = 0.4) +
+  # geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 0.4, alpha = 0.4) +
   xlab("Species") + ylab("Number of individuals") +
   geom_hline(yintercept = 300, linetype = "dashed", size = 1, color = "red")
 
 
 ```
 
-**Figure S3.1:** The true number of individuals per quadrat and field session, before the four density outliers were removed. Each point represents a quadrat, and the dotted red line shows the threshold of 300 individuals, above which we removed the quadrats from the dataset to avoid the risk of leverage effect.  <br>
+**Figure S3.1:** The true number of individuals per quadrat and field session, before the four density outliers were removed. The dotted red line shows the threshold of 300 individuals above which we removed the quadrats from the dataset to avoid the leverage effect. <br>
 
 <br>
 
@@ -401,10 +379,9 @@ ggplot(subset(df_3_methods, df_3_methods$counting_method == "count_30s" & df_3_m
 
 ```
 
-**Figure S3.2:** Distribution of the observations depending on the conspicuousness of the studied species and the habitat closure. Each point represents an observation by a participant on a quadrat for the first counting method, i.e. only one-third of the observations are represented. Random noise was added to the position of the points on the x-axis so that they do not overlap. The combinations that do not exist in the dataset, i.e. a very inconspicuous species in a very closed habitat or a very conspicuous species in a very open habitat, are uncommon in the field.  <br>
+**Figure S3.2:** Distribution of the observations depending on the conspicuousness of the studied species and the habitat closure. Each point represents an observation by a participant on a quadrat for the first counting method, i.e. only one-third of the observations are represented. Random noise was added to the position of the points on the x-axis so that they do not overlap. The combinations that do not exist in the dataset, i.e. a very inconspicuous species in a very closed habitat or a very conspicuous species in a very open habitat, are uncommon in the field. <br>
 
 <br>
-
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height = 6, fig.width = 7}
 # boxplots of the mean detection rate per observer for the 3 counting methods (after excess detections have been removed)
@@ -463,10 +440,29 @@ boxplot_mean_detect_rate_cells
 
 ```
 
-**Figure S3.3:** Mean proportion of detected individuals per observer after the excess detections were removed. Each point represents the mean detection proportion of an observer during a field session, with 1.00 being perfect detection. The colours indicate the observer’s experience in botany (1 = least experienced; 5 = most experienced).  <br>
+**Figure S3.3:** Mean proportion of detected individuals per observer after the excess detections were removed. Each point represents the mean detection proportion of an observer during a field session, with 1.00 being perfect detection. The colours indicate the observer's experience in botany (1 = least experienced; 5 = most experienced). <br>
 
 <br>
 
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height = 6, fig.width = 8}
+# 
+ggplot(subset(df_3_methods, df_3_methods$counting_method != "count_30s" & df_3_methods$count_TRUE > 0),
+       aes(x = exp_bota, y = counting_time)) +
+  facet_wrap(. ~ counting_method, labeller = as_labeller(c(`count_1m` = "Unlimited count", `count_cells` = "Cell count"))) +
+  geom_point() +
+  geom_smooth(method = 'lm', size = 2, se = FALSE, color = "red") +
+  stat_cor(p.accuracy = 0.001, r.accuracy = 0.01) +
+  geom_jitter(width = 0.2, height = 0) +
+  theme_bw() +
+  xlab("Experience in botany") +
+  ylab("Counting time (min)")
+
+
+```
+
+**Figure S3.4:** Distribution of the counting times depending on the level of experience in botany of the observers. Random noise was added to the position of the points on the x-axis so that they do not overlap. The red lines show basic linear regressions, and the values written in the top left corner are Pearson's correlation coefficients and the p-value of the associated test.  <br>
+
+<br>
 
 # Appendix 4: Description of the excess detections
 
@@ -507,14 +503,13 @@ n_obs_excess_without_empty_quadrats <- sum(df_3_methods_excess$excess_detect)
 
 ```
 
-The dataset was composed of a total of `r nrow(df_3_methods_0)` observations before removing the `r n_empty_quadrats` quadrats that did not contain any individual of the target species. `r n_obs_empty_quadrats` observations were made in these empty quadrats, only `r n_obs_excess_empty_quadrats` of which with excess detections. This seems to indicate that identification errors were extremely rare during the experiment, and that the excess detections were mainly due to errors in differentiating individuals.  <br>
+The dataset was composed of a total of `r nrow(df_3_methods_0)` observations before removing the `r n_empty_quadrats` quadrats that did not contain any individual of the target species. `r n_obs_empty_quadrats` observations were made in these empty quadrats, only `r n_obs_excess_empty_quadrats` of which with excess detections. This seems to indicate that identification errors were extremely rare during the experiment, and that the excess detections were mainly due to errors in differentiating individuals. <br>
 
-The description below refers to the dataset after removing the quadrats that did not contain any individual of the target species. After this filtering, the dataset contained `r nrow(df_3_methods_excess)` observations, of which `r n_obs_excess_without_empty_quadrats` excess detections.  <br>
-
+The description below refers to the dataset after removing the quadrats that did not contain any individual of the target species. After this filtering, the dataset contained `r nrow(df_3_methods_excess)` observations, of which `r n_obs_excess_without_empty_quadrats` excess detections. <br>
 
 <br>
 
-**Table S4.1:** Distribution of the observations with excess detections per field session.  <br>
+**Table S4.1:** Distribution of the observations with excess detections per field session. <br>
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # distribution of the excess detections across the field sessions
@@ -539,11 +534,11 @@ ft
 
 <br>
 
-The observations with excess detections made up less than 6.8% of the observations per field session, except for the session on Erigeron annuus (ERIANN; 26.7% observations over 100% detection). For this field session the detection of individuals was very easy as the individuals were in full flower and taller than the surrounding vegetation, which resulted in a high detection rate. Furthermore, many individuals had multiple stems and the ramification was close to the ground. It was possible to differentiate the individuals unambiguously by looking closely at the ramification, but the observers did not pay close attention. This combination of easy detection and the particular morphology of individuals led to these excess detections.  <br>
+The observations with excess detections made up less than 6.8% of the observations per field session, except for the session on Erigeron annuus (ERIANN; 26.7% observations over 100% detection). For this field session the detection of individuals was very easy as the individuals were in full flower and taller than the surrounding vegetation, which resulted in a high detection rate. Furthermore, many individuals had multiple stems and the ramification was close to the ground. It was possible to differentiate the individuals unambiguously by looking closely at the ramification, but the observers did not pay close attention. This combination of easy detection and the particular morphology of individuals led to these excess detections. <br>
 
 <br>
 
-**Table S4.2:** Distribution of the observations with excess detections per level of botany experience (1 = least experienced; 5 = most experienced).  <br>
+**Table S4.2:** Distribution of the observations with excess detections per level of botany experience (1 = least experienced; 5 = most experienced). <br>
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # distribution of the excess detections depending on the experience in botany
@@ -568,7 +563,7 @@ ft
 
 <br>
 
-The excess detections are roughly evenly distributed across the levels of experience in botany.  <br>
+The excess detections are roughly evenly distributed across the levels of experience in botany. <br>
 
 <br>
 
@@ -591,21 +586,121 @@ ggplot(data = df_3_methods_excess,
 
 ```
 
-**Figure S4.1:** Difference between the counts made by the observers and the true number of individuals present in the quadrats. The lower part of the graph is truncated, but not the upper part, so all excess detections are represented. The majority of the excess detections occurred in quadrats containing few individuals, and were below 110% of the true number of individuals.  <br>
-
+**Figure S4.1:** Difference between the counts made by the observers and the true number of individuals present in the quadrats. The lower part of the graph is truncated, but not the upper part, so all excess detections are represented. The majority of the excess detections occurred in quadrats containing few individuals, and were below 110% of the true number of individuals. <br>
 
 
 <br>
 
-# Appendix 5: Model comparison table
+# Appendix 5: Model goodness-of-fit assessment
 
-The model comparison is presented in the file “df_model_selection.csv” and is attached as a separate document.  <br>
+We assessed the goodness-of-fit of the model using the R package DHARMa (Hartig, 2022). This package uses a simulation approach to produce scaled residuals for Generalised Linear Mixed Models (GLMMs), which can be interpreted as residuals from classic linear models to assess a model's fit. For a detailed explanation of how the package works and how to interpret residual diagnostic plots, see the vignette of the package here: <https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html> <br>
+
+## Main residual diagnostic plots
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height = 7, fig.width = 13}
+# simulate scaled residuals
+simulationOutput <- DHARMa::simulateResiduals(fittedModel = mod_final_s, n = 1500, plot = FALSE)
+
+# make the two main diagnostic plots (quantile-quantile plot and residuals against predicted values)
+plot(simulationOutput)
+```
 
 <br>
 
-# Appendix 6: Coefficients of the selected model
+Overall the model fit seems very good ! On the quantile-quantile plot (left) there is a slight deviation from the x=y line, but this deviation is very small. On the three tests performed by the DHARMa package, the dispersion test and the outlier test are non-significant, which means that the simulated dispersion is equal to the observed dispersion and that there are no simulation outliers, respectively. However the KS uniformity test is significant, which seems logical given the deviation we can see on the QQ plot and the large number of observations in the dataset. A visual inspection of the QQ plot shows that although the deviation exists, it is small. It seems unlikely that this could substantially affect the model estimates, especially given the robustness of GLMMs to violations of distributional assumptions (Schielzeth et al., 2020). The residuals against predicted values plot (right) supports this interpretation, as there is no clear pattern in the residuals. <br>
 
-All predictors were standardised before fitting the model. The model fitting function (using the R package lme4) is below:  <br>
+## Residuals against predictors plots
+
+We now plot the residuals against the predictors in the model to check if there is a lack of fit for some predictor. <br>
+
+### Species conspicuousness
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# plot residuals against the predictor species_conspicuousness
+plotResiduals(simulationOutput, form = as.factor(df_3_methods$species_conspicuousness))
+```
+
+<br>
+
+There is a slight deviation from the expected distribution, but no systematic pattern. <br>
+
+### Habitat closure
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# plot residuals against the predictor habitat_closure
+plotResiduals(simulationOutput, form = df_3_methods$habitat_closure)
+```
+
+<br>
+
+There is a slight deviation from a perfect uniform distribution as it can be seen by the fitted quantile regression line (dashed red line), but it seems small and without a systematic pattern. <br>
+
+### Counting method
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# plot residuals against the predictor counting_method
+plotResiduals(simulationOutput, form = as.factor(df_3_methods$counting_method))
+```
+
+<br>
+
+There is a statistically significant deviation from the uniform distribution for the quick count and the unlimited count (count_30s and count_1m, respectively), but the box-whisker plot shows that this deviation is very small. <br>
+
+### Experience in botany
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# plot residuals against the predictor exp_bota
+plotResiduals(simulationOutput, form = as.factor(df_3_methods$exp_bota))
+```
+
+<br>
+
+As for the counting methods, there is a deviation for the experience levels in botany 3, 4 and 5. There could be a systematic pattern here (deviation increases with the level in botany), but the deviation is very small, so it seems there is nothing to worry about. <br>
+
+### True density of individuals
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# plot residuals against the predictor count_TRUE
+plotResiduals(simulationOutput, form = df_3_methods$count_TRUE)
+```
+
+<br>
+
+The fitted quantile regression finds a significant deviation but it's very small and no pattern can be seen in the residuals. <br>
+
+### Quadrat order
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# plot residuals against the predictor quadrat_order
+plotResiduals(simulationOutput, form = as.factor(df_3_methods$quadrat_order))
+```
+
+<br>
+
+There is no deviation from the expected uniform distribution. <br>
+
+### Counting time
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# plot residuals against the predictors counting_time_1m and counting_time_cells
+plotResiduals(simulationOutput, form = df_3_methods$counting_time_1m)
+plotResiduals(simulationOutput, form = df_3_methods$counting_time_cells)
+```
+
+<br>
+
+For the two plots above, the strange pattern in the residuals (no points in the left half of the plots) comes from the fact that we had to code manually the two counting time variables, as for one of the three counting methods the counting time was fixed at 30 seconds and not variable as it was for the other two methods. We created two separate variables (counting_time_1m and counting_time_cells), which contained the recorded counting times for the unlimited count and the cell count, respectively. For the rows of the dataset concerning the other counting methods, the values of these two variables were set to zero. Thus, only the right part of the plots have to be interpreted here, and there seems to be no clear pattern in the residuals in this part of the plots. <br>
+
+## References
+
+-   Florian Hartig (2022). DHARMa: Residual Diagnostics for Hierarchical (Multi-Level / Mixed) Regression Models. R package version 0.4.6. <http://florianhartig.github.io/DHARMa/> <br>
+-   Schielzeth, H., Dingemanse, N. J., Nakagawa, S., Westneat, D. F., Allegue, H., Teplitsky, C., Réale, D., Dochtermann, N. A., Garamszegi, L. Z., & Araya-Ajoy, Y. G. (2020). Robustness of linear mixed-effects models to violations of distributional assumptions. Methods in Ecology and Evolution, 11(9), 1141--1152. <https://doi.org/10.1111/2041-210X.13434> <br>
+
+<br>
+
+# Appendix 6: Coefficients of the model
+
+All predictors were standardised before fitting the model. The model fitting function (using the R package lme4) is below: <br>
 
 ```{r, eval=FALSE, echo=TRUE, message=FALSE, warning=FALSE}
 
@@ -626,7 +721,7 @@ mod_final <- glmer(prop_detect ~ (1|species) + (1|species:quadrat_id) + (1|obs_i
 
 <br>
 
-**Table S6.1:** Fixed effect coefficients of the selected model.  <br>
+**Table S6.1:** Fixed effect coefficients of the selected model. <br>
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # print the table
@@ -642,7 +737,7 @@ ft
 
 <br>
 
-**Table S6.2:** Random effect standard deviations and variances of the selected model.  <br>
+**Table S6.2:** Random effect standard deviations and variances of the selected model. <br>
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # print the table
@@ -657,7 +752,6 @@ ft
 ```
 
 <br>
-
 
 ```{r, include = FALSE}
 ### compute the predicted values cited in main text of the article
@@ -712,9 +806,6 @@ pred_1m_time_effect_1_10 <- as.data.frame(ggeffects::ggpredict(mod_final, terms 
 pred_1m_time_effect_1_10 <- subset(pred_1m_time_effect_1_10, pred_1m_time_effect_1_10$group == "count_1m")
 
 ```
-
-
-
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height = 6, fig.width = 7}
 ### predicted differences between the levels of experience in botany depending on species conspicuousness and habitat closure
@@ -802,18 +893,15 @@ plot_exp_comparison
 
 ```
 
-
-**Figure S6.1:** Predicted detection probability depending on the level of experience in botany of the observer in easy detection conditions (species conspicuousness = 4; habitat closure = -1.5), average conditions (species conspicuousness = 2.5; habitat closure = 0.5) and difficult conditions (species conspicuousness = 1; habitat closure = 2.5). Only the values in average conditions are used in the main text.  <br>
+**Figure S6.1:** Predicted detection probability depending on the level of experience in botany of the observer in easy detection conditions (species conspicuousness = 4; habitat closure = -1.5), average conditions (species conspicuousness = 2.5; habitat closure = 0.5) and difficult conditions (species conspicuousness = 1; habitat closure = 2.5). Only the values in average conditions are used in the main text. <br>
 
 <br>
-
 
 # Appendix 7: Results with excess detections reduced to 100% detection
 
 <br>
 
-The three figures below are the alternative versions of Figs 2–4 from the main text, made by fitting the model to the dataset in which the excess detections were set to a 100% detection rate instead of removing them from the dataset. The differences are imperceptible, which indicates that the excess detections did not play a role in the analysis results.  <br>
-
+The three figures below are the alternative versions of Figs 2--4 from the main text, made by fitting the model to the dataset in which the excess detections were set to a 100% detection rate instead of removing them from the dataset. The differences are imperceptible, which indicates that the excess detections did not play a role in the analysis results. <br>
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 ### load data
@@ -868,7 +956,6 @@ mod_final_excess_to_1_s <- glmer(prop_detect ~ (1|species) + (1|species:quadrat_
 ```
 
 <br>
-
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height = 7, fig.width = 9.5}
 # make the table with the betas for the selected model
@@ -941,9 +1028,9 @@ plot_figure_2
 
 ```
 
-**Figure S7.1:** Coefficients of standardised variables in the selected model. Dots represent estimated coefficients, and lines represent 95% confidence intervals. Positive coefficients (blue) indicate that when the variable increases, the proportion of detected individuals increases, while negative coefficients (red) indicate the opposite. Coefficients with a non-significant effect are shown in grey. For the variable ‘counting method’, the reference level is the estimate of the number of individuals in 30 sec. The coefficients presented for the other two methods indicate the difference in mean detection rate obtained with those methods compared to the reference level.  <br>
+**Figure S7.1:** Coefficients of standardised variables in the selected model. Dots represent estimated coefficients, and lines represent 95% confidence intervals. Positive coefficients (blue) indicate that when the variable increases, the proportion of detected individuals increases, while negative coefficients (red) indicate the opposite. Coefficients with a non-significant effect are shown in grey. For the variable 'counting method', the reference level is the estimate of the number of individuals in 30 sec. The coefficients presented for the other two methods indicate the difference in mean detection rate obtained with those methods compared to the reference level. <br>
 
-  <br>
+<br>
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height = 7, fig.width = 9}
 mypalette <- c('#e41a1c','#377eb8','#4daf4a','#984ea3')
@@ -1046,9 +1133,9 @@ plot_figure_3
 
 ```
 
-**Figure S7.2:** Predicted detection probability of individuals depending on species conspicuousness, habitat closure, counting time and the counting method used. The other variables included in the model are held constant at the following levels: exp_bota = 2.5, count_TRUE = 100, quadrat_order = 5. Lines represent the mean proportion of detected individuals, and the shading represents 95% confidence intervals.  <br>
+**Figure S7.2:** Predicted detection probability of individuals depending on species conspicuousness, habitat closure, counting time and the counting method used. The other variables included in the model are held constant at the following levels: exp_bota = 2.5, count_TRUE = 100, quadrat_order = 5. Lines represent the mean proportion of detected individuals, and the shading represents 95% confidence intervals. <br>
 
-  <br>
+<br>
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height = 3.6, fig.width = 9}
 
@@ -1168,7 +1255,7 @@ plot_figure_4
 
 ```
 
-**Figure S7.3:** Predicted detection probability of individuals depending on the experience in botany of the observer (A), the true density (B) and the position of the quadrat in the round (C). The other variables included in the model are held constant at the following levels: species conspicuousness = 2, habitat closure = 0, quick count time = 0.5 min, unlimited count time = 3 min, cell count time = 3 min. Lines represent the mean detection probability of individuals, and the shading represents 95% confidence intervals.  <br>
+**Figure S7.3:** Predicted detection probability of individuals depending on the experience in botany of the observer (A), the true density (B) and the position of the quadrat in the round (C). The other variables included in the model are held constant at the following levels: species conspicuousness = 2, habitat closure = 0, quick count time = 0.5 min, unlimited count time = 3 min, cell count time = 3 min. Lines represent the mean detection probability of individuals, and the shading represents 95% confidence intervals. <br>
 
 <br>
 
@@ -1210,9 +1297,7 @@ mod_final_xp_s <- glmer(prop_detect ~ (1|species) + (1|species:quadrat_id) + (1|
 
 ```
 
-
-The three figures below are the alternative versions of Figs 2–4 from the main text, made by fitting the model to a version of the dataset where only the observers with a high level of experience in botany were kept (i.e. levels of experience of 4 and 5 out of 5). This reduced the number of observations in the dataset from `r nrow(df_3_methods)` to `r nrow(df_3_methods_xp)`. This resulted in substantial differences in the parameter estimates and in the model’s predictions, but the general pattern of the predictions was unchanged. This indicates that our results are not due to an excess of observers with little or no field experience in our sample of observers.  <br>
-
+The three figures below are the alternative versions of Figs 2--4 from the main text, made by fitting the model to a version of the dataset where only the observers with a high level of experience in botany were kept (i.e. levels of experience of 4 and 5 out of 5). This reduced the number of observations in the dataset from `r nrow(df_3_methods)` to `r nrow(df_3_methods_xp)`. This resulted in substantial differences in the parameter estimates and in the model's predictions, but the general pattern of the predictions was unchanged. This indicates that our results are not due to an excess of observers with little or no field experience in our sample of observers. <br>
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height = 7, fig.width = 9.5}
 # make the table with the betas for the selected model
@@ -1486,17 +1571,8 @@ my_text[1] <- paste0(my_text[1], ".")
 
 ```
 
-We would like to warmly thank the following 167 volunteers who participated in the experiment, some of them multiple times, including during the preliminary tests:  <br>
+We would like to warmly thank the following 167 volunteers who participated in the experiment, some of them multiple times, including during the preliminary tests: <br>
 
 `r my_text[1]`
 
-
-
-  <br>
-  <br>
-  <br>
-
-
-
-
-
+<br> <br> <br>
