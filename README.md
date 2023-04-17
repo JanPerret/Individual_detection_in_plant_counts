@@ -1,3 +1,6 @@
+
+[![DOI](https://zenodo.org/badge/516378133.svg)](https://zenodo.org/badge/latestdoi/516378133)
+
 # Individual detection in plant counts
 
 This repository contains all the data and code for a paper published in *Journal of Ecology* dealing with the detection probability of individuals in counts of unmarked plants. Please contact me if something goes wrong with the code, or for any question.
