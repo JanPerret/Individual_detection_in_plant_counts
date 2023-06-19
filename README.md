@@ -3,7 +3,11 @@
 
 # Individual detection in plant counts
 
-This repository contains all the data and code for a paper published in *Journal of Ecology* dealing with the detection probability of individuals in counts of unmarked plants. Please contact me if something goes wrong with the code, or for any question.
+Data and code for the following paper:
+
+Perret, J., Besnard, A., Charpentier, A., & Papuga, G. (2023). Plants stand still but hide: Imperfect and heterogeneous detection is the rule when counting plants. Journal of Ecology. https://doi.org/10.1111/1365-2745.14110
+
+Please contact me if something goes wrong with the code, or for any question.
 
 Mail: [jan.perret@cefe.cnrs.fr](mailto:jan.perret@cefe.cnrs.fr) or [jan.perret@gmail.com](mailto:jan.perret@gmail.com)
 
